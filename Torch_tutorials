@@ -11,6 +11,8 @@ from keras.datasets import mnist
 import matplotlib.pyplot as plt
 import numpy as np
 
+##tensorflow is shit
+
 batch_size=int(60000/128)
 epochs=5
 
