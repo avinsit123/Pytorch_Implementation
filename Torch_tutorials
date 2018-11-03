@@ -62,25 +62,7 @@ for i in range(epochs):
     print("Epoch::",i+1)
     print("Training Loss after epoch",i+1,"is ",loss.item())
     print("Training model accuracy is ",model_accuracy(model,X_train,y_train))
-    print("Test model accuracy is ",model_accuracy(model,X_test,y_test))
-    print("___________________________________________________")
-    
-for i in range(5):
-    plt.imshow(X_test[i].reshape(28,28))
-    result=model(X_test[i].float())
-    result=result.data.numpy()
-    print("The Digit is",np.argmax(result))
-    plt.show()
-    
-    
-"""Output 
-Epoch:: 1
-Training Loss after epoch 1 is  0.2724051773548126
-Training model accuracy is  94.11333333333334
-Test model accuracy is  93.56
-___________________________________________________
-Epoch:: 2
-Training Loss after epoch 2 is  0.16064175963401794
+    print("Test model accuracy is "175963401794
 Training model accuracy is  96.39
 Test model accuracy is  95.0
 ___________________________________________________
