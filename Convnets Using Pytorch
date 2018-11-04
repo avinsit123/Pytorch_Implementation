@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov  4 22:42:07 2018
+
+@author: r17935avinash
+"""
+import torch
+from torch import nn as nn
+from keras.datasets import mnist
+import torch.nn.functional as T
+import matplotlib.pyplot as plt
+import numpy as np
+import time
+batch_size=int(60000/128)
+epochs=5
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model,self).__init__()
+        self.conv1=nn.Conv2d(1,12,3)
+        self.pool=nn.MaxPool2d(2,2)
+        self.conv2=nn.Conv2d(12,6,3)
+        self.fc1=nn.Linear(150,10)
+
+        
+    def forward(self,x):
+        op2=self.pool(T.relu(self.conv1(x)))
+        op2=self.pool(T.relu(self.conv2(op2)))
+        #op2=self.pool(T.relu(self.conv2(op2)))
+        op2=op2.view(-1,150)
+        op2=self.fc1(op2)
+        return op2
+    
+model=Model()
+
+(X_train,y_train),(X_test,y_test)=mnist.load_data()
+
+criterion=torch.nn.CrossEntropyLoss()
+optimizer=torch.optim.Adam(model.parameters(),lr=0.001)
+
+X_train=X_train.reshape(60000,1,28,28)
+X_test=X_test.reshape(10000,1,28,28)
+X_train=torch.from_numpy(X_train)
+X_test=torch.from_numpy(X_test)
+y_train=torch.from_numpy(y_train)
+y_test=torch.from_numpy(y_test)
+
+
+def model_accuracy(model,X,y):
+    pred=model(X.float())
+    total=0
+    correct=0
+    _, predicted = torch.max(pred.data, 1)
+    total += y.size(0)
+    correct += (predicted == y.long()).sum().item()
+    return (correct/total)*100
+
+
+for i in range(epochs):
+    
+    
+    
+    for current in range(128):
+        since=time.time()
+        temp_train=X_train[current*(batch_size):(current+1)*batch_size]
+        temp_label=y_train[current*(batch_size):(current+1)*batch_size]
+        output=model(temp_train.float())
+        model.zero_grad()
+        loss=criterion(output,temp_label.long())
+        loss.backward()
+        optimizer.step()
+    print("Epoch::",i+1)
+    print("Training Loss after epoch",i+1,"is ",loss.item())
+    print("Training model accuracy is ",model_accuracy(model,X_train,y_train))
+    print("Test model accuracy is ",model_accuracy(model,X_test,y_test))
+    print("Time taken is",time.time()-since)
+    print("___________________________________________________")
+    
+    
+for i in range(5):
+    plt.imshow(X_test[i].reshape(28,28))
+    result=model(X_test[i].float())
+    result=result.data.numpy()
+    print("The Digit is",np.argmax(result))
+    plt.show()
+
+"""Epoch:: 1
+Training Loss after epoch 1 is  0.33523887395858765
+Training model accuracy is  89.98333333333333
+Test model accuracy is  90.77
+Time taken is 33.73501491546631
+___________________________________________________
+Epoch:: 2
+Training Loss after epoch 2 is  0.17723305523395538
+Training model accuracy is  94.07
+Test model accuracy is  94.59
+Time taken is 27.084736824035645
+___________________________________________________
+Epoch:: 3
+Training Loss after epoch 3 is  0.13541096448898315
+Training model accuracy is  95.39166666666667
+Test model accuracy is  95.98
+Time taken is 34.11903405189514
+___________________________________________________
+Epoch:: 4
+Training Loss after epoch 4 is  0.11767510324716568
+Training model accuracy is  96.1
+Test model accuracy is  96.52
+Time taken is 34.56232404708862
+___________________________________________________
+Epoch:: 5
+Training Loss after epoch 5 is  0.10878118127584457
+Training model accuracy is  96.48333333333333
+Test model accuracy is  96.75
+Time taken is 40.86946487426758
+___________________________________________________"""
