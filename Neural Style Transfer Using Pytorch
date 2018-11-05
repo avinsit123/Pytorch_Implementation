@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov  5 21:53:16 2018
+
+@author: r17935avinash
+"""
+
+from __future__ import print_function
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+import torchvision.models as model
+def gram_mat(input):
+    a,b,c,d=input.size()
+    #a=1
+    features=input.view(a*b,c*d)
+    f=torch.mm(features,features.t())
+    #Calculate multiplication of transformation
+    return f.div(a*b*c*d)
+    
+class ContentLoss(nn.Module):
+    def __init__(self,target):
+        super(ContentLoss,self).__init__()
+        self.target=target.detach()
+    
+    def forward(self,input):
+        self.loss=F.mse_loss(input,self.target)
+        #print(self.loss)
+        return input
+    
+class StyleLoss(nn.Module):
+    def __init__(self,target):
+        super(StyleLoss,self).__init__
+        self.target=gram_mat(target).detach()
+        
+    def forward(self,input):
+        self.loss=F.mse_loss(input,self.target)
+        return input
+    
+
+class Normalize(nn.Module):
+    def __init__(self,mean,std):
+        super(Normalize,self).__init__()
+        self.mean = torch.tensor(mean).view(-1, 1, 1)
+        self.std = torch.tensor(std).view(-1, 1, 1)
+        
+    def forward(self,input):
+        return (input-self.mean)/self.std;
+            
