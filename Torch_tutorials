@@ -10,6 +10,7 @@ import torch
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import OrderedDict
 
 ##tensorflow is shit
 
@@ -31,10 +32,10 @@ def model_accuracy(model,X,y):
     return (correct/total)*100
     
 
-model=torch.nn.Sequential(
-        torch.nn.Linear(784,256),
-        torch.nn.ReLU(),
-        torch.nn.Linear(256,10))
+model=torch.nn.Sequential(OrderedDict([
+        ('fc1':torch.nn.Linear(784,256)),
+        ('relu':torch.nn.ReLU()),
+        ('fc2':torch.nn.Linear(256,10)),]))
 
 
 
